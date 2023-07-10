@@ -5,6 +5,7 @@ import styles from './schedulepage.module.css';
 function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(moment());
   const [selectedDay, setSelectedDay] = useState(null);
+  const [showHours, setShowHours] = useState(false);
 
   const handlePrevMonth = () => {
     setCurrentMonth(currentMonth.clone().subtract(1, 'month'));
@@ -17,18 +18,26 @@ function Calendar() {
   const handleDayClick = (day) => {
     if (day.isSameOrAfter(moment(), 'day')) {
       setSelectedDay(day);
+      setShowHours(true);
       console.log(day.format('YYYY-MM-DD')); // Log the selected day in YYYY-MM-DD format
     }
   };
 
   return (
-    <div className={styles.maindiv}>
-      <div className={styles.calendartop}>
-        <button className={styles.prevbutton} onClick={handlePrevMonth}>Prev</button>
-        <h2 className={styles.months}>{currentMonth.format('YYYY')}</h2>
-        <button className={styles.nextbutton} onClick={handleNextMonth}>Next</button>
+    <div className={styles.maincontainer}>
+      <div className={styles.maindiv}>
+        <div className={styles.calendartop}>
+          <button className={styles.prevbutton} onClick={handlePrevMonth}>
+            Prev
+          </button>
+          <h2 className={styles.months}>{currentMonth.format('MMMM YYYY')}</h2>
+          <button className={styles.nextbutton} onClick={handleNextMonth}>
+            Next
+          </button>
+        </div>
+        <Month month={currentMonth} selectedDay={selectedDay} onDayClick={handleDayClick} />
       </div>
-      <Month month={currentMonth} selectedDay={selectedDay} onDayClick={handleDayClick} />
+      <div>{showHours && <Hours selectedDay={selectedDay} />}</div>
     </div>
   );
 }
@@ -88,7 +97,9 @@ function Month({ month, selectedDay, onDayClick }) {
     <table className={styles.table}>
       <thead className={styles.thead}>
         <tr className={styles.tr}>
-          <th className={styles.th} colSpan="7">{month.format('MMMM')}</th>
+          <th className={styles.th} colSpan="7">
+            {month.format('MMMM YYYY')}
+          </th>
         </tr>
         <tr>{renderWeekdays()}</tr>
       </thead>
@@ -97,8 +108,78 @@ function Month({ month, selectedDay, onDayClick }) {
   );
 }
 
+function Hours({ selectedDay }) {
+  const [selectedHour, setSelectedHour] = useState(null);
+
+  const handleHourClick = (hour) => {
+    if (selectedHour === hour) {
+      setSelectedHour(null); // Deselect the hour
+      console.log(null); // Log the deselected hour
+    } else {
+      setSelectedHour(hour); // Select the hour
+      console.log(formatHour(hour)); // Log the selected hour
+    }
+  };
+
+  const formatHour = (hour) => {
+    if (hour === 0) {
+      return '12AM';
+    } else if (hour === 12) {
+      return '12PM';
+    } else if (hour > 12) {
+      return `${hour - 12}PM`;
+    } else {
+      return `${hour}AM`;
+    }
+  };
+
+  return (
+    <div className={styles.rightsidecontainer}>
+      <div className={styles.rightsidecontainerDiv}>
+        <h4 className={styles.h4text}>Select the time slot</h4>
+        <div className={styles.hoursmaincontainer}>
+          <div className={styles.hourscontainer}>
+            <div className={styles.column}>
+              <h4 className={styles.h4text}>AM</h4>
+              {[...Array(12)].map((_, index) => (
+                <div
+                  className={
+                    selectedHour === index + 1 ? styles.hourBoxSelected : styles.hourBox
+                  }
+                  key={index}
+                  onClick={() => handleHourClick(index + 1)}
+                >
+                  {formatHour(index + 1)} - {formatHour(index + 2)}
+                </div>
+              ))}
+            </div>
+            <div className={styles.column}>
+              <h4 className={styles.h4text}>PM</h4>
+              {[...Array(12)].map((_, index) => (
+                <div
+                  className={
+                    selectedHour === index + 13 ? styles.hourBoxSelected : styles.hourBox
+                  }
+                  key={index}
+                  onClick={() => handleHourClick(index + 13)}
+                >
+                  {formatHour(index + 1 + 12)} - {formatHour(index + 2 + 12)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SchedulePage() {
-  return <Calendar />;
+  return (
+    <div className={styles.maincontainer}>
+      <Calendar />
+    </div>
+  );
 }
 
 export default SchedulePage;
