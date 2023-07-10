@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import moment from 'moment';
+import styles from './schedulepage.module.css';
 
 function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(moment());
+  const [selectedDay, setSelectedDay] = useState(null);
 
   const handlePrevMonth = () => {
     setCurrentMonth(currentMonth.clone().subtract(1, 'month'));
@@ -13,23 +15,25 @@ function Calendar() {
   };
 
   const handleDayClick = (day) => {
-    console.log(day.format('YYYY-MM-DD')); // Log the selected day in YYYY-MM-DD format
+    if (day.isSameOrAfter(moment(), 'day')) {
+      setSelectedDay(day);
+      console.log(day.format('YYYY-MM-DD')); // Log the selected day in YYYY-MM-DD format
+    }
   };
 
   return (
-    <div>
-      <h1>Clickable Calendar</h1>
-      <div>
-        <button onClick={handlePrevMonth}>Prev</button>
-        <h2>{currentMonth.format('MMMM YYYY')}</h2>
-        <button onClick={handleNextMonth}>Next</button>
+    <div className={styles.maindiv}>
+      <div className={styles.calendartop}>
+        <button className={styles.prevbutton} onClick={handlePrevMonth}>Prev</button>
+        <h2 className={styles.months}>{currentMonth.format('YYYY')}</h2>
+        <button className={styles.nextbutton} onClick={handleNextMonth}>Next</button>
       </div>
-      <Month month={currentMonth} onDayClick={handleDayClick} />
+      <Month month={currentMonth} selectedDay={selectedDay} onDayClick={handleDayClick} />
     </div>
   );
 }
 
-function Month({ month, onDayClick }) {
+function Month({ month, selectedDay, onDayClick }) {
   const daysInMonth = month.daysInMonth();
   const monthStart = month.startOf('month');
   const firstDay = monthStart.day();
@@ -51,15 +55,20 @@ function Month({ month, onDayClick }) {
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 7; j++) {
         if (day <= daysInMonth) {
-          const classNames = ['day'];
+          const classNames = [styles.day];
           if (i === 0 && j < firstDay) {
             cells.push(<td key={j} />);
           } else {
             const currentDate = moment(monthStart).date(day);
-            classNames.push(currentDate.isSame(moment(), 'day') ? 'today' : '');
+            if (currentDate.isSameOrBefore(moment(), 'day')) {
+              classNames.push(styles.pastDay);
+            }
+            if (selectedDay && currentDate.isSame(selectedDay, 'day')) {
+              classNames.push(styles.currentDay);
+            }
 
             cells.push(
-              <td key={j} onClick={() => handleDayClick(currentDate)}>
+              <td className={styles.td} key={j} onClick={() => handleDayClick(currentDate)}>
                 <div className={classNames.join(' ')}>{day}</div>
               </td>
             );
@@ -76,10 +85,10 @@ function Month({ month, onDayClick }) {
   };
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th colSpan="7">{month.format('MMMM YYYY')}</th>
+    <table className={styles.table}>
+      <thead className={styles.thead}>
+        <tr className={styles.tr}>
+          <th className={styles.th} colSpan="7">{month.format('MMMM')}</th>
         </tr>
         <tr>{renderWeekdays()}</tr>
       </thead>
@@ -93,3 +102,4 @@ function SchedulePage() {
 }
 
 export default SchedulePage;
+
