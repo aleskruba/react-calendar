@@ -1,0 +1,61 @@
+.maindiv{
+    width: 300px;
+    height: 300px;
+
+}
+
+.prevbutton{
+    background-color: lightgray;
+    border-radius: 5px;
+}
+
+.nextbutton{
+    background-color: lightgray;
+    border-radius: 5px;
+}
+
+.months{
+
+}
+
+.table{
+    width: 300px;
+    height: 300px;
+
+}
+
+.thead{
+
+}
+
+.tr{
+
+}
+
+.th{
+
+}
+
+.td{
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.pastDay {
+    background-color: lightgray;
+  }
+  
+  .currentDay {
+    background-color: blue;
+    /* Add any other custom styles you desire */
+  }
+  
+  .calendartop{
+    display: flex;
+    justify-content: space-around;
+  }
+  .day{
+    border-radius: 5px;
+  }
